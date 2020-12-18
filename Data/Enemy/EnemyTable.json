@@ -1,0 +1,16 @@
+{
+    "Enemy_Data": [
+        {
+            "id": "1",
+            "name": "Goblin",
+            "health": "10",
+			"damage": "3"
+        },
+        {
+            "id": "2",
+            "name": "Test",
+            "health": "5",
+			"damage": "5"
+        }
+    ]
+}

@@ -1,0 +1,58 @@
+[gd_scene load_steps=6 format=2]
+
+[ext_resource path="res://Assets/Player.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Assets/Ground_Test.tscn" type="PackedScene" id=2]
+[ext_resource path="res://Scripts/Debug/Debug_Info.gd" type="Script" id=3]
+[ext_resource path="res://Assets/invis_wall.tscn" type="PackedScene" id=4]
+[ext_resource path="res://Assets/Enemy_Base.tscn" type="PackedScene" id=5]
+
+[node name="World" type="Node2D"]
+script = ExtResource( 3 )
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2( 730.382, 353.843 )
+current = true
+process_mode = 0
+smoothing_enabled = true
+
+[node name="Player" parent="." instance=ExtResource( 1 )]
+position = Vector2( 730.382, 353.843 )
+
+[node name="RemoteTransform2D" type="RemoteTransform2D" parent="Player"]
+remote_path = NodePath("../../Camera2D")
+
+[node name="Enemy_Base" parent="." instance=ExtResource( 5 )]
+position = Vector2( 267.51, 354.621 )
+id = 2
+
+[node name="Ground" type="Node" parent="."]
+
+[node name="Ground_Test" parent="Ground" instance=ExtResource( 2 )]
+position = Vector2( 459.577, 418.614 )
+scale = Vector2( 9.7182, 0.962639 )
+canDashThrough = false
+
+[node name="Ground_Test2" parent="Ground" instance=ExtResource( 2 )]
+position = Vector2( 128.599, 354.862 )
+scale = Vector2( 1.5, 1 )
+canDashThrough = false
+
+[node name="Ground_Test5" parent="Ground" instance=ExtResource( 2 )]
+position = Vector2( 520, 355.784 )
+
+[node name="Ground_Test6" parent="Ground" instance=ExtResource( 2 )]
+position = Vector2( 842.784, 982.654 )
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+layer = 0
+
+[node name="DebugLabel" type="RichTextLabel" parent="CanvasLayer"]
+margin_right = 185.0
+margin_bottom = 598.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Out Of Bounds Wall" parent="." instance=ExtResource( 4 )]
+position = Vector2( 360.97, 961.43 )
+scale = Vector2( 500, 1 )
