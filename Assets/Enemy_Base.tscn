@@ -18,6 +18,8 @@ extents = Vector2( 30.0399, 30.821 )
 
 [node name="enemy_base" type="KinematicBody2D"]
 script = ExtResource( 3 )
+directionSmooth = 1.0
+changeDirectionEase = 1.0
 
 [node name="Stats" type="Node" parent="."]
 script = ExtResource( 2 )

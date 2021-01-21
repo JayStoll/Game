@@ -34,5 +34,9 @@ class EnemyStats:
 
 	func GetHealth() -> int:
 		return stats.GetHealth()
+
+	func SetSprite(sprite : Sprite) -> void:
+		var tex = load("res://Sprites/Enemies/" +_data.enemyData.Enemy_Data[id].name + ".png")
+		sprite.texture = tex
 	
 	

@@ -61,7 +61,7 @@ func _physics_process(_delta):
 
 
 ###############   Player Movement   #######################
-func PlayerActions():
+func PlayerActions() -> void:
 	# get the direction that we want to move the character
 	var horizontalMovement = (int(Input.is_action_pressed("ui_right")) 
 							- int(Input.is_action_pressed("ui_left")))
@@ -81,7 +81,7 @@ func PlayerActions():
 	$player_collider.disabled = false
 
 # jump and gravity
-func Jump():
+func Jump() -> void:
 	if Input.is_action_pressed("ui_up"):
 		if hasJumped == true:
 			velocity.y = JUMP_POWER
@@ -96,7 +96,7 @@ func Jump():
 		hasJumped = false
 
 # dash logic
-func Dash():
+func Dash() -> void:
 	if Input.is_action_pressed("dash") && !hasDashed:
 		# set the dash speed 
 		velocity.x *= DASH_SPEED
@@ -110,29 +110,29 @@ func Dash():
 		# start the dash cooldown timer
 		timer.start()
 
-func Attack():
+func Attack() -> void:
+	SetAttackDirection()
 	if Input.is_action_just_pressed("attack"):
-		SetAttackDirection()
 		StartAttack()
 		attackTimer.start()
 
-func SetAttackDirection():
+func SetAttackDirection() -> void:
 	match attackDirection:
 		1:
 			attackCollision.position.x = COLLIDERPOS
 		-1:
 			attackCollision.position.x = -COLLIDERPOS
 
-func DealDamage(area):
+func DealDamage(area) -> void:
 	if canAttack:
 		GLOBALS.TakeDamage(area.get_parent().get_node("Stats"), attackDirection, stats.GetDamage())
 
-func StartAttack():
+func StartAttack() -> void:
 	isAttacking = true
 	attackCollision.disabled = false
 
 # reset the attack information to be ready for next input
-func AttackReset():
+func AttackReset() -> void:
 	isAttacking = false
 	attackCollision.disabled = true
 

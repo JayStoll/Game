@@ -22,3 +22,6 @@ class Stats:
 
 	func TakeDamage(damageAmount : int) -> void:
 		health -= damageAmount
+	
+	func Die(obj):
+		obj.queue_free()
