@@ -18,7 +18,7 @@ const SPEED :int = 125
 # set the location of the floor
 const FLOOR : Vector2 = Vector2(0, -1)
 
-const _KNOCKBACK_AMOUNT : int = 30
+const _KNOCKBACK_AMOUNT : int = 60
 
 # This here becuase everything will take damage
 static func TakeDamage(obj, attackDirection : int, amount : int):

@@ -7,6 +7,8 @@ extends KinematicBody2D
 var GLOBALS : Reference = preload("res://conf/GLOBALS.gd")
 
 onready var stats : Reference = get_node("PlayerStats").stats
+onready var playerSprite : Sprite = get_node("Sprite")
+onready var animation : AnimationPlayer = get_node("AnimationPlayer")
 
 # how high the player can jump
 # to jump upwards - this value must be negative
@@ -23,19 +25,19 @@ var hasJumped : bool = false
 var hasDashed : bool = false
 # see if we are able to dash through a colliding object
 var canDashThrough : bool = false
+var isWalking : bool = false
 
-# attack
+
+############# attack vaiables ##################
+
+# which direction the collider will have to face
 var attackDirection : int = 1
 onready var attackCollision : CollisionShape2D = get_node("Attack_Area/CollisionShape2D")
-# 1 this will remain positive on -1 this will become a negative
-const COLLIDERPOS : int = 65
+# get the position of the colider --- will be the same as Attack_Area/CollisionShape2D x position 
+const COLLIDERPOS : int = 17
 var isAttacking : bool = false
-# tell us if we are hitting something that can take damage
-var canAttack : bool = false
-
 # timer
 var timer : Timer = null
-var attackTimer : Timer = null
 
 
 ############## entry point #####################
@@ -44,20 +46,12 @@ func _ready():
 	timer = Timer.new() 
 	timer.set_one_shot(true)
 	timer.set_wait_time(DASH_CD)
-	timer.connect("timeout", self, "on_timeout_complete")
+	var _temp = timer.connect("timeout", self, "on_timeout_complete")
 	add_child(timer)
-
-	# once animation is added this will be removed
-	attackTimer = Timer.new() 
-	attackTimer.set_one_shot(true)
-	attackTimer.set_wait_time(ATTACK_CD)
-	attackTimer.connect("timeout", self, "attack_on_timeout_complete")
-	add_child(attackTimer)
 
 # runs once every frame
 func _physics_process(_delta):
 	PlayerActions()
-
 
 
 ###############   Player Movement   #######################
@@ -68,7 +62,11 @@ func PlayerActions() -> void:
 	velocity.x = horizontalMovement * GLOBALS.PLAYER_SPEED
 	if horizontalMovement != 0:
 		attackDirection = horizontalMovement
-	
+		isWalking = true
+	else:
+		isWalking = false
+
+	AnimationHandler()
 	# player functions
 	Jump()
 	Dash()
@@ -79,6 +77,13 @@ func PlayerActions() -> void:
 	# move_and_slide does delta calculations for us
 	velocity = move_and_slide(velocity, GLOBALS.FLOOR)
 	$player_collider.disabled = false
+	isAttacking = false
+
+func AnimationHandler() -> void:
+	if isWalking:
+		animation.play("Walk_Player")
+	if !isWalking && !isAttacking:
+		playerSprite.frame = 0
 
 # jump and gravity
 func Jump() -> void:
@@ -112,11 +117,12 @@ func Dash() -> void:
 
 func Attack() -> void:
 	SetAttackDirection()
-	if Input.is_action_just_pressed("attack"):
+	if Input.is_action_pressed("attack"):
+		isAttacking = true
 		StartAttack()
-		attackTimer.start()
 
 func SetAttackDirection() -> void:
+	FlipPayerSprite()
 	match attackDirection:
 		1:
 			attackCollision.position.x = COLLIDERPOS
@@ -124,24 +130,19 @@ func SetAttackDirection() -> void:
 			attackCollision.position.x = -COLLIDERPOS
 
 func DealDamage(area) -> void:
-	if canAttack:
-		GLOBALS.TakeDamage(area.get_parent().get_node("Stats"), attackDirection, stats.GetDamage())
+	GLOBALS.TakeDamage(area.get_parent().get_node("Stats"), attackDirection, stats.GetDamage())
 
 func StartAttack() -> void:
-	isAttacking = true
-	attackCollision.disabled = false
+	animation.play("Attack_Player")
 
-# reset the attack information to be ready for next input
-func AttackReset() -> void:
-	isAttacking = false
-	attackCollision.disabled = true
+# used to flip the player sprite
+# here so I dont have to repeat myself
+func FlipPayerSprite():
+	playerSprite.set_scale(Vector2(attackDirection, 1))
 
 # Allow the character to dash after the timer is up
 func on_timeout_complete():
 	hasDashed = false
-
-func attack_on_timeout_complete():
-	AttackReset()
 
 func _on_Area2D_area_entered(area):
 	match area.get_groups():
@@ -161,5 +162,5 @@ func _on_Attack_Area_area_entered(area):
 	if isAttacking:
 		match area.get_groups():
 			[GLOBALS.ENEMY_GROUP]:
-				canAttack = true
+				print("Attack")
 				DealDamage(area)

@@ -12,6 +12,7 @@ script = ExtResource( 3 )
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2( 730.382, 353.843 )
 current = true
+zoom = Vector2( 0.5, 0.5 )
 process_mode = 0
 smoothing_enabled = true
 
@@ -41,7 +42,7 @@ canDashThrough = false
 position = Vector2( 520, 355.784 )
 
 [node name="Ground_Test6" parent="Ground" instance=ExtResource( 2 )]
-position = Vector2( 842.784, 982.654 )
+position = Vector2( 842.409, 979.283 )
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 layer = 0
@@ -54,5 +55,5 @@ __meta__ = {
 }
 
 [node name="Out Of Bounds Wall" parent="." instance=ExtResource( 4 )]
-position = Vector2( 360.97, 961.43 )
+position = Vector2( 343.74, 1045.71 )
 scale = Vector2( 500, 1 )

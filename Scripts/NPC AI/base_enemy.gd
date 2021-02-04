@@ -5,6 +5,8 @@ var GLOBALS : Reference = preload("res://conf/GLOBALS.gd")
 
 const IDLE : int = 1
 
+const MAXFRAMECOUNT : int = 3
+
 onready var stats : Reference = get_node("Stats").stats
 
 export var id : int = 0
@@ -13,6 +15,7 @@ var velocity = Vector2(0,0)
 
 onready var player : KinematicBody2D = Utils.GetMainNode().get_node("Player")
 onready var flip : Node2D = $Flip
+onready var sprite : Sprite = get_node("Flip/Sprite")
 
 export var directionSmooth : float = 1
 export var changeDirectionEase : float = 1
@@ -23,16 +26,21 @@ var direction : int = 1
 var playerInAttackRange : bool = false
 var followRange : float = 150.00
 
+var count : int = 0
+
+func _ready():
+	sprite.frame = 0
+
 func _physics_process(delta):
 	FindAndFollowPlayer(delta)
 	if isFollowing:
 		velocity.x = GLOBALS.SPEED * direction
 
-	if playerInAttackRange:
-		Attack()
+	#if playerInAttackRange:
+	#	Attack()
 
 	velocity.y += GLOBALS.GRAVITY
-	
+	AnimationHandler()
 	velocity = move_and_slide(velocity, GLOBALS.FLOOR)
 
 
@@ -66,7 +74,20 @@ func FindAndFollowPlayer(delta):
 	else:
 		velocity.x = 0
 
-
+# Handles the animation of the enemy
+# Counts up in the frames resetting back to 0 when max frames are met
+## Frames must not exceed 4 for use with this function
+# TODO: Check if we can set the MAXFRAMECOUNT dynamically by the size of the frames
+func AnimationHandler() -> void:
+	if isFollowing:
+		sprite.frame = count
+		if count == MAXFRAMECOUNT:
+			count = 0
+		else:
+			count += 1
+	else:
+		sprite.frame = 0 
+	
 func Attack():
 	GLOBALS.TakeDamage(player.get_node("PlayerStats"), direction, stats.GetDamage())
 

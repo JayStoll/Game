@@ -1,25 +1,23 @@
 [gd_scene load_steps=8 format=2]
 
-[ext_resource path="res://icon.png" type="Texture" id=1]
+[ext_resource path="res://Sprites/Base-Enemy-Sprite.png" type="Texture" id=1]
 [ext_resource path="res://Scripts/Enemy/Enemy_Stats.gd" type="Script" id=2]
 [ext_resource path="res://Scripts/NPC AI/base_enemy.gd" type="Script" id=3]
 
 [sub_resource type="RectangleShape2D" id=1]
-extents = Vector2( 12.526, 35.1542 )
+extents = Vector2( 3.59801, 7.324 )
 
 [sub_resource type="RectangleShape2D" id=2]
-extents = Vector2( 30.7556, 31.5943 )
+extents = Vector2( 5.82774, 7.39945 )
 
 [sub_resource type="RectangleShape2D" id=3]
-extents = Vector2( 28.4059, 30.2966 )
+extents = Vector2( 8.45571, 8.32513 )
 
 [sub_resource type="RectangleShape2D" id=4]
-extents = Vector2( 30.0399, 30.821 )
+extents = Vector2( 8.70599, 8.15828 )
 
 [node name="enemy_base" type="KinematicBody2D"]
 script = ExtResource( 3 )
-directionSmooth = 1.0
-changeDirectionEase = 1.0
 
 [node name="Stats" type="Node" parent="."]
 script = ExtResource( 2 )
@@ -28,14 +26,16 @@ script = ExtResource( 2 )
 
 [node name="Sprite" type="Sprite" parent="Flip"]
 texture = ExtResource( 1 )
+hframes = 4
 
 [node name="Area2D" type="Area2D" parent="Flip"]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Flip/Area2D"]
-position = Vector2( 37.4177, 0 )
+position = Vector2( 8.8855, 0 )
 shape = SubResource( 1 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2( -0.500565, 0 )
 shape = SubResource( 2 )
 
 [node name="DashCollider" type="Area2D" parent="." groups=[
