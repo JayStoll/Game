@@ -2,7 +2,6 @@
 
 extends KinematicBody2D
 
-
 ############ Variables #################
 var GLOBALS : Reference = preload("res://conf/GLOBALS.gd")
 
@@ -20,28 +19,49 @@ const DASH_CD : float = 1.5
 # attack cd
 const ATTACK_CD : float	= 0.05
 
-var velocity : Vector2 = Vector2(0, 0)
+var velocity : Vector2 = Vector2.ZERO
 var hasJumped : bool = false
 var hasDashed : bool = false
 # see if we are able to dash through a colliding object
 var canDashThrough : bool = false
+
+
+#### Animation Handle
 var isWalking : bool = false
+var isAttacking : bool = false
+var animationStateMachine : AnimationNodeStateMachinePlayback
 
 
 ############# attack vaiables ##################
-
 # which direction the collider will have to face
 var attackDirection : int = 1
 onready var attackCollision : CollisionShape2D = get_node("Attack_Area/CollisionShape2D")
 # get the position of the colider --- will be the same as Attack_Area/CollisionShape2D x position 
-const COLLIDERPOS : int = 17
-var isAttacking : bool = false
+const COLLIDERPOS : int = 15
 # timer
 var timer : Timer = null
 
 
+########### State Machine ##############
+var currentState = null
+
+onready var States = {
+	"Idle"     : $States/Idle,
+	"Walk"     : $States/Walk,
+	"Attack"   : $States/Attack,
+	"Dash"     : $States/Dash,
+	"Jump"     : $States/Jump,
+	"Falling"  : $States/Falling
+}
+
+
 ############## entry point #####################
 func _ready():
+	animationStateMachine = $AnimationTree.get("parameters/playback")
+	animationStateMachine.start("Idle")
+
+	ChangeState("Idle")
+
 	# create timer for dash cooldown
 	timer = Timer.new() 
 	timer.set_one_shot(true)
@@ -50,23 +70,20 @@ func _ready():
 	add_child(timer)
 
 # runs once every frame
-func _physics_process(_delta):
-	PlayerActions()
+func _physics_process(delta):
+	var updateState = currentState.HandleInput(self, delta)
+	if updateState != null:
+		ChangeState(updateState)
 
+
+func ChangeState(newState):
+	currentState = States[newState]
+	print(currentState.name)
 
 ###############   Player Movement   #######################
 func PlayerActions() -> void:
-	# get the direction that we want to move the character
-	var horizontalMovement = (int(Input.is_action_pressed("ui_right")) 
-							- int(Input.is_action_pressed("ui_left")))
-	velocity.x = horizontalMovement * GLOBALS.PLAYER_SPEED
-	if horizontalMovement != 0:
-		attackDirection = horizontalMovement
-		isWalking = true
-	else:
-		isWalking = false
+	
 
-	AnimationHandler()
 	# player functions
 	Jump()
 	Dash()
@@ -78,13 +95,7 @@ func PlayerActions() -> void:
 	velocity = move_and_slide(velocity, GLOBALS.FLOOR)
 	$player_collider.disabled = false
 	isAttacking = false
-
-func AnimationHandler() -> void:
-	if isWalking:
-		animation.play("Walk_Player")
-	if !isWalking && !isAttacking:
-		playerSprite.frame = 0
-
+		
 # jump and gravity
 func Jump() -> void:
 	if Input.is_action_pressed("ui_up"):
@@ -117,9 +128,9 @@ func Dash() -> void:
 
 func Attack() -> void:
 	SetAttackDirection()
-	if Input.is_action_pressed("attack"):
+	if Input.is_action_just_pressed("attack"):
 		isAttacking = true
-		StartAttack()
+	
 
 func SetAttackDirection() -> void:
 	FlipPayerSprite()
@@ -131,9 +142,6 @@ func SetAttackDirection() -> void:
 
 func DealDamage(area) -> void:
 	GLOBALS.TakeDamage(area.get_parent().get_node("Stats"), attackDirection, stats.GetDamage())
-
-func StartAttack() -> void:
-	animation.play("Attack_Player")
 
 # used to flip the player sprite
 # here so I dont have to repeat myself
@@ -159,8 +167,6 @@ func _on_Area2D_area_exited(area):
 
 
 func _on_Attack_Area_area_entered(area):
-	if isAttacking:
-		match area.get_groups():
-			[GLOBALS.ENEMY_GROUP]:
-				print("Attack")
-				DealDamage(area)
+	match area.get_groups():
+		[GLOBALS.ENEMY_GROUP]:
+			DealDamage(area)

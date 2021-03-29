@@ -36,8 +36,8 @@ func _physics_process(delta):
 	if isFollowing:
 		velocity.x = GLOBALS.SPEED * direction
 
-	#if playerInAttackRange:
-	#	Attack()
+	if playerInAttackRange:
+		Attack()
 
 	velocity.y += GLOBALS.GRAVITY
 	AnimationHandler()
